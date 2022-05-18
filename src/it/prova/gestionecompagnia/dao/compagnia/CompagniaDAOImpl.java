@@ -205,6 +205,7 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 
 	// TODO implementare metodo findByIdEager(Compagnia input) alla fine preso l
 	// impiegato fai input.getImpiegati().add(impiegatoTemp)
+	@Override
 	public void findByIdEager(Compagnia input) {
 		// controllo l input
 		if (input == null || input.getId() < 1)

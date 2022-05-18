@@ -41,7 +41,7 @@ public class TestCompagnia {
 			testUpdateCompagnia(compagniaDAOInstance);
 			testUpdateImpiegato(impiegatoDAOInstance);
 
-			// testDeleteCompagnia(compagniaDAOInstance);
+		    //testDeleteCompagnia(compagniaDAOInstance);
 			// testDeleteImpiegato(impiegatoDAOInstance);
 			
 			testFindByExampleCompagnia(compagniaDAOInstance);
@@ -57,6 +57,10 @@ public class TestCompagnia {
 			testFindAllByCompagnia(compagniaDAOInstance,impiegatoDAOInstance );
 			
 			testCountByDataFondazioneCompagniaGratherThan(impiegatoDAOInstance);
+			
+			testFindAllByCompagniaConFatturatoMaggioreDi(impiegatoDAOInstance);
+			
+			testFindAllByErroriAssunzione(impiegatoDAOInstance);
 			
 			
 			
@@ -163,7 +167,8 @@ public class TestCompagnia {
 		// impiegati di daEliminare
 
 		System.out.println("_----------testDeleteCompagnia-----------_");
-		Compagnia daEliminare = compagniaDAOInstance.list().get(2);
+		Compagnia daEliminare = compagniaDAOInstance.list().get(1);
+		compagniaDAOInstance.findByIdEager(daEliminare);
 
 		System.out.println("Dati in compagnia prima del delete: " + compagniaDAOInstance.list().size());
 
@@ -301,6 +306,34 @@ public class TestCompagnia {
 		
 	}
 	
+	private static void testFindAllByCompagniaConFatturatoMaggioreDi(ImpiegatoDAO impiegatoDAOInstance) {
+		
+		System.out.println("_-------------testfindAllByCompagniaConFatturatoMaggioreDi");
+		
+		List<Impiegato> result = impiegatoDAOInstance.findAllByCompagniaConFatturatoMaggioreDi(20000);
+		
+		for(Impiegato impiegatoItem : result) {
+			System.out.println(impiegatoItem.getNome());
+		}
+		
+		System.out.println("_---------findAllByCompagniaConFatturatoMaggioreDi PASSED-----------_");
+	}
+	
+	
+	
+	private static void testFindAllByErroriAssunzione(ImpiegatoDAO impiegatoDAOInstance) {
+		
+		System.out.println("_-------------testFindAllByErroriAssunzione-----------_");
+		
+		List<Impiegato> result = impiegatoDAOInstance.findAllByErroriAssunzione();
+		
+		for(Impiegato impiegatoItem : result) {
+			System.out.println(impiegatoItem.getNome());
+		}
+		
+		System.out.println("_---------testFindAllByErroriAssunzione PASSED-----------_");
+		
+	}
 	
 	
 	

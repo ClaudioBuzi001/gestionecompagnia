@@ -14,7 +14,7 @@ public interface CompagniaDAO extends IBaseDAO<Compagnia>{
 	//findAllByCodiceFiscaleImpiegatoContiene(String patter) codice fiscale del impiegato %cs%
 	public List<Compagnia> findAllByCodiceFiscaleImpiegatoContiene(String codiceFiscaleDaRicercare);
 	
-	
+	public void findByIdEager(Compagnia input);
 	
 	
 }
