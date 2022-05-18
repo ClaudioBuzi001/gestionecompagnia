@@ -277,8 +277,8 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 		
 			ps.setDate(1, new java.sql.Date(dateConfronto.getTime())); 
 			try (ResultSet rs = ps.executeQuery()) {
-				while (rs.next()) {
-					contatore++;
+				if (rs.next()) {
+					contatore = rs.getInt("count(*)");
 				}//while
 
 			}
