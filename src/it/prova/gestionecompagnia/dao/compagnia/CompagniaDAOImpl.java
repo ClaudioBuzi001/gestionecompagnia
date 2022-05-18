@@ -326,13 +326,15 @@ public class CompagniaDAOImpl extends AbstractMySQLDAO implements CompagniaDAO {
 
 			ps.setNString(1, "%" + codiceFiscaleDaRicercare + "%");
 			try (ResultSet rs = ps.executeQuery()) {
-				Compagnia compagniaTemp = new Compagnia();
-				compagniaTemp.setRagioneSociale(rs.getString("ragionesociale"));
-				compagniaTemp.setId(rs.getLong("ID"));
-				compagniaTemp.setFatturatoAnnuo(rs.getInt("fatturatoannuo"));
-				compagniaTemp.setDataFondazione(rs.getDate("datafondazione"));
+				while(rs.next()) {
+					Compagnia compagniaTemp = new Compagnia();
+					compagniaTemp.setRagioneSociale(rs.getString("ragionesociale"));
+					compagniaTemp.setId(rs.getLong("ID"));
+					compagniaTemp.setFatturatoAnnuo(rs.getInt("fatturatoannuo"));
+					compagniaTemp.setDataFondazione(rs.getDate("datafondazione"));
 
-				result.add(compagniaTemp);
+					result.add(compagniaTemp);
+				}
 
 			}
 

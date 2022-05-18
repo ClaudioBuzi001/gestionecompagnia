@@ -51,6 +51,15 @@ public class TestCompagnia {
 			
 			findAllByRagioneSocialeContiene(compagniaDAOInstance);
 			
+			testFindAllByCodiceFiscaleImpiegatoContiene(compagniaDAOInstance);
+			
+			//METODI IMPIEGATO
+			testFindAllByCompagnia(compagniaDAOInstance,impiegatoDAOInstance );
+			
+			testCountByDataFondazioneCompagniaGratherThan(impiegatoDAOInstance);
+			
+			
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -244,9 +253,53 @@ public class TestCompagnia {
 		
 	}
 	
+	private static void testFindAllByCodiceFiscaleImpiegatoContiene(CompagniaDAO compagniaDAOInstance) {
+		System.out.println("_-------------findAllByCodiceFiscaleImpiegatoContiene-----------_");
+		
+		String codiceFiscale = "aih5";
+		
+		List<Compagnia> result = compagniaDAOInstance.findAllByCodiceFiscaleImpiegatoContiene(codiceFiscale);
+		
+		for(Compagnia compagniaItem : result) {
+			System.out.println(compagniaItem.getRagioneSociale());
+		}
+		
+		System.out.println("__---------------------findAllByCodiceFiscaleImpiegatoContiene PASSED--------------_");
+		
+		
+	}
+	
+	
+	private static void testFindAllByCompagnia(CompagniaDAO compagniaDAOInstance, ImpiegatoDAO impiegatoDAOInstance) throws Exception {
+		System.out.println("_-----------testFindAllByCompagnia---------------_");
+		
+		Compagnia compagniaDainserire = compagniaDAOInstance.get(2L);
+		
+		List<Impiegato> result = impiegatoDAOInstance.findAllByCompagnia(compagniaDainserire);
+		
+		for(Impiegato impiegatoTemp : result) {
+			System.out.println(impiegatoTemp.getNome());
+		}
+		
+		System.out.println("_--------------testFindAllByCompagnia PASSED-------------_");
+		
+		
+	}
 	
 	
 	
+	private static void testCountByDataFondazioneCompagniaGratherThan(ImpiegatoDAO impiegatoDAOInstance) throws ParseException {
+		System.out.println("_---------------countByDataFondazioneCompagniaGratherThan-----------_");
+		
+		Date dataDaConfrontare = new SimpleDateFormat("dd-MM-yyyy").parse("01-01-1999");
+		
+		int result = impiegatoDAOInstance.countByDataFondazioneCompagniaGratherThan(dataDaConfrontare);
+		
+		System.out.println(result);
+		
+		System.out.println("_---------------countByDataFondazioneCompagniaGratherThan PASSED-----------_");
+		
+	}
 	
 	
 	
