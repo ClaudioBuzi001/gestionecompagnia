@@ -1,6 +1,8 @@
 package it.prova.gestionecompagnia.test;
 
 import java.sql.Connection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -45,6 +47,9 @@ public class TestCompagnia {
 			testFindByExampleCompagnia(compagniaDAOInstance);
 			testFindByExampleImpiegato(impiegatoDAOInstance);
 			
+			findAllByDataAssunzioneMaggioreDi(compagniaDAOInstance);
+			
+			findAllByRagioneSocialeContiene(compagniaDAOInstance);
 			
 
 		} catch (Exception e) {
@@ -208,6 +213,36 @@ public class TestCompagnia {
 		
 	}
 	
+	
+	private static void findAllByDataAssunzioneMaggioreDi(CompagniaDAO compagniaDAOInstance) throws ParseException {
+		System.out.println("_----------findAllByDataAssunzioneMaggioreDi-------------_");
+		
+		Date dataAssunzione = new SimpleDateFormat("dd-MM-yyyy").parse("01-01-2020");
+		
+		List<Compagnia> result = compagniaDAOInstance.findAllByDataAssunzioneMaggioreDi(dataAssunzione);
+		
+		for(Compagnia compagniaItem : result) {
+			System.out.println(compagniaItem.getRagioneSociale());
+		}
+		
+		System.out.println("_-----------findAllByDataAssunzioneMaggioreDi PASSED------------_");
+		
+		
+	}
+	
+	private static void findAllByRagioneSocialeContiene(CompagniaDAO compagniaDAOInstance) {
+		System.out.println("_-------------------findAllByRagioneSocialeContiene-------------_");
+		
+		String daCercare = "vin";
+		List<Compagnia> result = compagniaDAOInstance.findAllByRagioneSocialeContiene(daCercare);
+	
+		for(Compagnia compagniaItem : result)
+			System.out.println(compagniaItem.getRagioneSociale());
+		
+		System.out.println("_-----------------findAllByRagioneSocialeContiene-----------_");
+		
+		
+	}
 	
 	
 	

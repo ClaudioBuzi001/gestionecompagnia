@@ -130,7 +130,7 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 			ps.setDate(4, new java.sql.Date(input.getDataNascita().getTime()));
 			ps.setDate(5, new java.sql.Date(input.getDataAssunzione().getTime()));
 			ps.setLong(6, input.getCompagnia().getId());
-			
+
 			result = ps.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -143,10 +143,10 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 	public int delete(Impiegato input) throws Exception {
 		if (isNotActive())
 			throw new Exception("Connessione non attiva. Impossibile effettuare operazioni DAO.");
-		
-		if(input == null || input.getId() < 1)
+
+		if (input == null || input.getId() < 1)
 			throw new RuntimeException("Errore: input non valido!");
-		
+
 		int result = 0;
 		try (PreparedStatement ps = connection.prepareStatement("delete from impiegato where id = ?;")) {
 			ps.setLong(1, input.getId());
@@ -156,7 +156,7 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 			throw e;
 		}
 		return result;
-	
+
 	}
 
 	@Override
@@ -172,37 +172,37 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 
 		// Iniziamo il corpo della costruzione della query
 		String query = "select * from impiegato where 1=1 ";
-		
-		//Se nome esiste
-		if(input.getNome() != null || !input.getNome().isEmpty()) {
-			query += " and nome like '" + input.getNome()+ "%' ";
+
+		// Se nome esiste
+		if (input.getNome() != null || !input.getNome().isEmpty()) {
+			query += " and nome like '" + input.getNome() + "%' ";
 		}
-		
-		//Se cognome
-		if(input.getCognome() != null || !input.getCognome().isEmpty()) {
-			query += " and cognome like '" + input.getCognome()+ "%' ";
+
+		// Se cognome
+		if (input.getCognome() != null || !input.getCognome().isEmpty()) {
+			query += " and cognome like '" + input.getCognome() + "%' ";
 		}
-		
-		//se codice fiscale
-		if(input.getCodiceFiscale() != null || !input.getCodiceFiscale().isEmpty()) {
-			query += " and codicefiscale like '" + input.getCodiceFiscale()+ "%' ";
+
+		// se codice fiscale
+		if (input.getCodiceFiscale() != null || !input.getCodiceFiscale().isEmpty()) {
+			query += " and codicefiscale like '" + input.getCodiceFiscale() + "%' ";
 		}
-		
-		//se data nascita
+
+		// se data nascita
 		if (input.getDataNascita() != null) {
 			query += " and nascita ='" + new java.sql.Date(input.getDataNascita().getTime()) + "' ";
 		}
-		
-		//se data assunzione
+
+		// se data assunzione
 		if (input.getDataAssunzione() != null) {
 			query += " and dataassunzione ='" + new java.sql.Date(input.getDataAssunzione().getTime()) + "' ";
 		}
-		
-		//se compagnia DA VERIFICARE SE GIUSTO
-		if(input.getCompagnia() != null && input.getCompagnia().getId()>1) {
-			query += " and compagnia_id = "+ input.getCompagnia().getId();
+
+		// se compagnia DA VERIFICARE SE GIUSTO
+		if (input.getCompagnia() != null && input.getCompagnia().getId() > 1) {
+			query += " and compagnia_id = " + input.getCompagnia().getId();
 		}
-		
+
 		query += ";";
 
 		// Abbiamo finito di costruire la query
@@ -217,8 +217,8 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 				temp.setCodiceFiscale(rs.getString("codicefiscale"));
 				temp.setDataNascita(rs.getDate("datanascita"));
 				temp.setDataAssunzione(rs.getDate("dataassunzione"));
-				//non settiamo compangia in qualunque caso, sia se c e la abbiamo sia no
-							
+				// non settiamo compangia in qualunque caso, sia se c e la abbiamo sia no
+
 				result.add(temp);
 			}
 		} catch (Exception e) {
@@ -230,26 +230,131 @@ public class ImpiegatoDAOImpl extends AbstractMySQLDAO implements ImpiegatoDAO {
 
 	@Override
 	public List<Impiegato> findAllByCompagnia(Compagnia compagnia) {
-		// TODO Auto-generated method stub
-		return null;
+
+		// data
+		if (compagnia == null || compagnia.getId() < 1)
+			throw new RuntimeException("ERRORE: input non valido");
+
+		List<Impiegato> result = new ArrayList<Impiegato>();
+
+		try (PreparedStatement ps = connection.prepareStatement(
+				"select * from impiegato i inner join compagnia c on i.compagnia_id = c.id where c.ragionesociale = ?;")) {
+
+			ps.setString(1, compagnia.getRagioneSociale());
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					Impiegato temp = new Impiegato();
+					temp.setNome(rs.getString("nome"));
+					temp.setCognome(rs.getString("cognome"));
+					temp.setCodiceFiscale(rs.getString("codicefiscale"));
+					temp.setDataNascita(rs.getDate("datanascita"));
+					temp.setDataAssunzione(rs.getDate("dataassunzione"));
+
+					result.add(temp);
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			// rilancio in modo tale da avvertire il chiamante
+			throw new RuntimeException(e);
+		}
+
+		return result;
 	}
 
 	@Override
 	public int countByDataFondazioneCompagniaGratherThan(Date dateConfronto) {
-		// TODO Auto-generated method stub
-		return 0;
+		//cotenggio di quanti impiegati lavorano in compagnie fondate dal 2000 in poi
+		if (dateConfronto == null )
+			throw new RuntimeException("ERRORE: input non valido");
+
+		int contatore = 0;
+
+		try (PreparedStatement ps = connection.prepareStatement("select count(*) from impiegato i inner join compagnia c on i.compagnia_id = c.id where c.datafondazione > ?;")){
+			
+		
+			ps.setDate(1, new java.sql.Date(dateConfronto.getTime())); 
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					contatore++;
+				}//while
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			// rilancio in modo tale da avvertire il chiamante
+			throw new RuntimeException(e);
+		}
+
+		return contatore;
+		
 	}
 
 	@Override
 	public List<Impiegato> findAllByCompagniaConFatturatoMaggioreDi(int fatturatoInput) {
-		// TODO Auto-generated method stub
-		return null;
+		if (fatturatoInput < 1)
+			throw new RuntimeException("ERRORE: input non valido");
+
+		List<Impiegato> result = new ArrayList<Impiegato>();
+
+		try (PreparedStatement ps = connection.prepareStatement(
+				"select * from impiegato i inner join compagnia c on i.compagnia_id = c.id where c.fatturatoannuo > ?;")) {
+
+			ps.setInt(1, fatturatoInput);
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					Impiegato temp = new Impiegato();
+					temp.setNome(rs.getString("nome"));
+					temp.setCognome(rs.getString("cognome"));
+					temp.setCodiceFiscale(rs.getString("codicefiscale"));
+					temp.setDataNascita(rs.getDate("datanascita"));
+					temp.setDataAssunzione(rs.getDate("dataassunzione"));
+
+					result.add(temp);
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			// rilancio in modo tale da avvertire il chiamante
+			throw new RuntimeException(e);
+		}
+
+		return result;
 	}
 
 	@Override
 	public List<Impiegato> findAllByErroriAssunzione() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Impiegato> result = new ArrayList<Impiegato>();
+
+		try (PreparedStatement ps = connection.prepareStatement(
+				"select * from impiegato i inner join compagnia c on i.compagnia_id = c.id where i.dataassunzione < c.datafondazione ;")) {
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					Impiegato temp = new Impiegato();
+					temp.setNome(rs.getString("nome"));
+					temp.setCognome(rs.getString("cognome"));
+					temp.setCodiceFiscale(rs.getString("codicefiscale"));
+					temp.setDataNascita(rs.getDate("datanascita"));
+					temp.setDataAssunzione(rs.getDate("dataassunzione"));
+
+					result.add(temp);
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			// rilancio in modo tale da avvertire il chiamante
+			throw new RuntimeException(e);
+		}
+
+		return result;
 	}
 
 }
